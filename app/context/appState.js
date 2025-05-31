@@ -1,5 +1,5 @@
-import chatContext from "./chatContext";
-import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect, createContext } from "react";
 import io from "socket.io-client";
 // 192.168.0.104
 //http://192.168.0.104:8000
@@ -8,11 +8,11 @@ import io from "socket.io-client";
 const hostName = "http://localhost:8000";
 var socket = io(hostName);
 
+export const chatContext = createContext();
+
 const ChatState = (props) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    localStorage.getItem("token") ? true : false
-  );
-  const [user, setUser] = useState(localStorage.getItem("user") || {});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState({});
   const [receiver, setReceiver] = useState({});
   const [messageList, setMessageList] = useState([]);
   const [activeChatId, setActiveChatId] = useState("");
@@ -22,13 +22,22 @@ const ChatState = (props) => {
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+useEffect(() => {
+  (async () => {
+    const token = await AsyncStorage.getItem("token");
+  const user1 = await AsyncStorage.getItem("user") || {}
+    setIsAuthenticated(!!token);
+    setUser(user1)
+  })();
+}, []);
+
   const fetchData = async () => {
     try {
       const response = await fetch(`${hostName}/conversation/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem("token"),
+          "auth-token": await AsyncStorage.getItem("token"),
         },
       });
       if (!response.ok) {
@@ -62,7 +71,7 @@ const ChatState = (props) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = await AsyncStorage.getItem("token");
         if (token) {
           const res = await fetch(`${hostName}/auth/me`, {
             method: "GET",
@@ -81,8 +90,8 @@ const ChatState = (props) => {
         console.log(error);
         setIsAuthenticated(false);
         setUser({});
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("user");
       }
     };
 
