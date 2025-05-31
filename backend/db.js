@@ -4,7 +4,7 @@ dotenv.config({ path: "./.env" });
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect('mongodb+srv://madhu:7lyNoPE6fdVPpulZ@chatapp.epfpklw.mongodb.net/?retryWrites=true&w=majority&appName=ChatApp', {
+    const conn = await mongoose.connect("", {
       dbName: "conversa-chatapp",
     });
 

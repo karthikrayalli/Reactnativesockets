@@ -9,7 +9,7 @@ const imageupload = require("../config/imageupload.js");
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
-const JWT_SECRET = "6fd131d2fb2d495d1f3baf1a7035e70efb48b4e14e23c558ca79e6e3032c2499";
+const JWT_SECRET = "";
 
 let mailTransporter = nodemailer.createTransport({
   service: "gmail",
